@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
+<head>
     <title>Архитектура безопасной авторизации на примере протоколов OAuth и OIDC</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,158 +10,631 @@
     <!-- prettier-ignore -->
     <link rel="stylesheet" href="node_modules/@shower/ribbon/styles/styles.css">
     <style>
-      :root {
-        --text-primary: black;
-        --text-invert: white;
-      }
+		:root {
+			--text-primary: black;
+			--text-invert: white;
+		}
 
-      .montserrat {
-        font-family: "Montserrat", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 100;
-        font-style: normal;
-      }
+		.montserrat {
+			font-family: "Montserrat", sans-serif;
+			font-optical-sizing: auto;
+			font-weight: 100;
+			font-style: normal;
+		}
 
-      .shower {
-        --slide-ratio: calc(16 / 9);
-        --ribbon-size: 40px;
-        font-family: "Montserrat", sans-serif;
-        font-optical-sizing: auto;
-        font-style: normal;
-      }
+		.shower {
+			--slide-ratio: calc(16 / 9);
+			--ribbon-size: 40px;
+			font-family: "Montserrat", sans-serif;
+			font-optical-sizing: auto;
+			font-style: normal;
+		}
 
-      .progress::before {
-        background-color: #ed4344;
-      }
+		.progress::before {
+			background-color: #ed4344;
+		}
 
-      .slide {
-        padding-top: 51px;
-      }
+		.slide {
+			padding-top: 51px;
+		}
 
-      .slide.clear {
-        background-image: none;
-      }
+		.slide.clear {
+			background-image: none;
+		}
 
-      .slide::after {
-        width: 42px;
-        top: 4px;
-        right: 15px;
-        left: auto;
-        background: url("pictures/pagination.svg");
-        background-position: center;
-        background-repeat: no-repeat;
-        color: #000;
-      }
 
-      .slide.black li {
-        color: var(--text-invert);
-      }
-      .slide.black li::before {
-        color: var(--text-invert);
-      }
+		.slide::after {
+			width: 42px;
+			top: 4px;
+			right: 15px;
+			left: auto;
+			background: url("pictures/pagination.svg");
+			background-position: center;
+			background-repeat: no-repeat;
+			color: #000000;
+		}
 
-      .slide {
-        color: var(--text-primary);
-      }
-      .slide.black {
-        color: var(--text-invert);
-      }
+		.slide.black li {
+			color: var(--text-invert);
+		}
 
-      .slide h2 {
-        color: var(--text-primary);
-        font-size: 60px;
-      }
-      
-      .slide.black h2 {
-        color: var(--text-invert);
-      }
+		.slide.black li::before {
+			color: var(--text-invert);
+		}
 
-      .cover {
-        z-index: 1;
-      }
+		.slide {
+			color: var(--text-primary);
+		}
+
+		.slide.black {
+			color: var(--text-invert);
+		}
+
+		.slide h2 {
+			color: var(--text-primary);
+			font-size: 60px;
+		}
+
+		.slide.black h2 {
+			color: var(--text-invert);
+		}
+
+		.cover {
+			z-index: 1;
+		}
+
+		.plus {
+			content: "";
+			display: inline-block;
+			margin-bottom: -2px;
+			width: 20px;
+			height: 20px;
+			background: url(pictures/plus1.png);
+			background-size: 100% 100%;
+		}
+
+		.minus {
+			content: "";
+			display: inline-block;
+			margin-bottom: -2px;
+			width: 20px;
+			height: 20px;
+			background: url(pictures/minus1.png);
+			background-size: 100% 100%;
+		}
+
+		.clear-list li:before {
+			content: '' !important;
+			width: 0 !important;
+			margin-right: 0;
+		}
+
     </style>
-  </head>
-  <body class="shower list">
-    <header class="caption">
-      <h1>Архитектура безопасной авторизации на примере протоколов OAuth и OIDC</h1>
-      <p>Иван Поддубный, CTO Вебпрактик</p>
-    </header>
+</head>
+<body class="shower list">
+<header class="caption">
+    <h1>Архитектура безопасной авторизации на примере протоколов OAuth и OIDC</h1>
+    <p>Иван Поддубный, CTO Вебпрактик</p>
+</header>
 
-    <section class="slide clear" id="cover">
-      <div>
+<section class="slide clear" id="cover">
+    <div>
         <h2>Архитектура безопасной авторизации на примере протоколов OAuth и OIDC</h2>
         <p><b>Иван Поддубный</b><br>CTO Вебпрактик</p>
-      </div>
-      <style>
-        #cover {
-          background: url("pictures/fc24-title.png") no-repeat center center;
-          background-size: contain;
-        }
-        #cover div {
-          width: 580px;
-          padding-top: 0px;
-          margin-left: -40px;
-        }
-        #cover h2 {
-          margin: 0;
-          font-size: 60px;
-          font-weight: 700;
-        }
-        #cover p {
-          margin: 18px 0 0;
-          font-size: 34px;
-          line-height: 150%;
-        }
-      </style>
-    </section>
+    </div>
+    <style>
+		#cover {
+			background: url("pictures/fc24-title.png") no-repeat center center;
+			background-size: contain;
+		}
 
-    <section class="slide">
-      <h2><span>Кто я</span></h2>
-      <ol>
+		#cover div {
+			width: 580px;
+			padding-top: 0px;
+			margin-left: -40px;
+		}
+
+		#cover h2 {
+			margin: 0;
+			font-size: 60px;
+			font-weight: 700;
+		}
+
+		#cover p {
+			margin: 18px 0 0;
+			font-size: 34px;
+			line-height: 150%;
+		}
+    </style>
+</section>
+
+<section class="slide">
+    <h2><span>Кто я</span></h2>
+    <ol>
         <li>14+ лет в вебе. Прошел путь fullstack, teamlead</li>
         <li>Работаю CTO в Вебпрактик (~140 человек)</li>
         <li>Член программного комитета TechLeadConf, Podlodka Crew</li>
         <li>Пишу на Typescript, Nodejs (Nest) и React, PHP</li>
         <li>Организатор Ростовского PHP сообщества (400+ человек)</li>
         <li>Влюблен в Linux, OpenSource.</li>
-      </ol>
+    </ol>
 
-    </section>
+</section>
 
-    <section class="slide clear">
-      <h2 style="font-size: 40px; position: relative; z-index: 2;"><span>Вебпрактик — веб-интегратор для корпораций</span></h2>
-      <img style="" width="900" class="cover" src="pictures/clients.svg" alt="">
+<section class="slide clear">
+    <h2 style="font-size: 40px; position: relative; z-index: 2;"><span>Вебпрактик — веб-интегратор для корпораций</span></h2>
+    <img style="" width="900" class="cover" src="pictures/clients.svg" alt="">
 
-    </section>
+</section>
 
 
-    <section class="slide">
-      <h2>Shower key features</h2>
-      <ol>
-        <li>Built on HTML, CSS and JavaScript</li>
-        <li>Works in all modern browsers</li>
-        <li>Themes are separated from engine</li>
-        <li>Fully keyboard accessible</li>
-        <li>Printable to PDF</li>
-      </ol>
-      <p class="note">Shower ['ʃəuə] noun. A person or thing that shows.</p>
-    </section>
+<section class="slide">
+    <h2 class="shout" style="font-size: 80px">Авторизация</h2>
+</section>
 
-    <section class="slide">
-      <h2>Shower key features</h2>
-      <ol>
-        <li>Built on HTML, CSS and JavaScript</li>
-        <li>Works in all modern browsers</li>
-        <li>Themes are separated from engine</li>
-        <li>Fully keyboard accessible</li>
-        <li>Printable to PDF</li>
-      </ol>
-      <p class="note">Shower ['ʃəuə] noun. A person or thing that shows.</p>
-    </section>
+<section class="slide ">
+    <h2><span>Вопросы в зал</span></h2>
+    <ul>
+        <li>Кто из вас реализовывал аутентификацию в SPA приложениях?</li>
+        <li class="next">Кто делал stateless авторизацию на JWT токенах?</li>
+        <li class="next">Кто читал OWASP рекомендации (или RFC 8725 JSON Web Token Best Current Practices) как сделать это безопасно?</li>
+    </ul>
+</section>
 
-    <section class="slide">
-      <h2>Plain text on your slides</h2>
-      <p>
+<section class="slide ">
+    <h2><span>Проблемы первого раза для stateless авторизации в SPA</span></h2>
+    <ul>
+        <li class="next">Масса статей которые очень поверхностно разбирают лишь самые базовые аспекты</li>
+        <li class="next">Отсутствие знаний по грамотной эксплуатации <br> и защите токенов</li>
+        <li class="next">Наваять как скажет бекендер, который на поверку не всегда может быть грамотен</li>
+    </ul>
+</section>
+
+<section class="slide ">
+    <h2 class="shout" style="font-size: 50px; padding: 0 70px; width: auto;">Как следствие мы можем встречать решения <br> с плохими практиками в области безопасности <br> на многих проектах</h2>
+</section>
+
+<section class="slide ">
+    <h2 class="shout" style="font-size: 50px; padding: 0 70px; width: auto;">Ошибки реализации авторизации каждый год входят в ТОП-10 разновиденостей уязвимостей OWASP</h2>
+</section>
+
+<section class="slide ">
+    <h2 class=" shrink ">Терминология</h2>
+    <ul>
+        <li><b>Аутентификация</b> — процедура проверки подлинности, доказательство, что пользователь именно тот, за кого себя выдает.</li>
+        <li><b>Авторизация</b> — предоставление определённых прав.
+        </li>
+    </ul>
+</section>
+
+
+<section class="slide">
+    <h2>Вас поставили пилить новый проект</h2>
+    <ul>
+        <li>На проекте должна быть авторизация</li>
+        <li>Сервис публичный, есть персональные данные</li>
+        <li>На проекте есть SSR</li>
+    </ul>
+</section>
+
+
+<section class="slide clear black">
+    <img class="cover" src="pictures/back-api-front.jpg" alt="">
+</section>
+
+<section class="slide clear black">
+    <h2 style="position: relative; z-index: 2;">Сессии, OIDC/oAuth, custom JWT</h2>
+    <img class="cover" src="pictures/variants-auth.jpg" alt="">
+</section>
+
+<section class="slide black">
+    <h2 class="shout" style="color: #ffffff; position: relative; z-index: 2;">Custom JWT Auth</h2>
+    <img class="cover" src="pictures/variants-auth.jpg" alt="">
+</section>
+
+
+<section class="slide ">
+    <h2>JWT</h2>
+    <img width="630" src="pictures/jwt-basic.png" alt="">
+</section>
+
+<section class="slide ">
+    <h2>Stateful (session) аутентификация</h2>
+    <p>Классическая аутентификация в монолитных приложениях</p>
+    <img width="400" style="float: right" src="pictures/session-auth.svg" alt="">
+    <ul class="clear-list next">
+        <li><i class="plus"></i> Простота</li>
+        <li><i class="plus"></i> Проще обеспечить безопасность</li>
+        <li><i class="minus"></i> Скорость</li>
+        <li><i class="minus"></i> Масштабирование</li>
+        <li><i class="minus"></i> Плохо подходит SOA/MSA</li>
+    </ul>
+</section>
+
+<section class="slide ">
+    <h2>Stateless (JWT)</h2>
+    <img style="float: right" src="pictures/jwt-auth.svg" alt="">
+    <ul class="clear-list">
+        <li><i class="plus"></i> Масштабирование</li>
+        <li><i class="plus"></i> Скорость</li>
+        <li><i class="minus"></i> Сложнее обеспечить безопасность</li>
+    </ul>
+</section>
+
+
+<section class="slide ">
+    <h2 class="shout shrink" style="font-size: 60px;">Бекендер выплевывает вам JWT токен <br> в ответе на метод авторизации...</h2>
+</section>
+
+
+<section class="slide ">
+    <h2 class="shout shrink" style="font-size: 60px;">Какие вопросы перед нами встают?</h2>
+</section>
+
+
+<section class="slide ">
+    <h2>Где хранить JWT токен на клиенте?</h2>
+
+    <blockquote>
+        <p>Я могу сэкономить, не дергать лишний раз бекенд для получения данных пользователя, его групп и проч.</p>
+    </blockquote>
+
+    По этому
+    <ul>
+        <li>Сохраню его локально</li>
+        <li>Буду прикреплять к каждому запросу</li>
+        <li>И использовать данные для своего приложения</li>
+    </ul>
+
+
+</section>
+
+<section class="slide ">
+    <h2>Где хранить JWT токен на клиенте?</h2>
+
+    <table class="next">
+        <tr>
+            <th></th>
+            <th width="30%">В local storage</th>
+            <th>В cookie HttpOnly</th>
+        </tr>
+        <tr class="next">
+            <td>XSS</td>
+            <td><span class="next">уязвим</span></td>
+            <td><span class="next">защищен</span></td>
+        </tr>
+        <tr class="next">
+            <td>SSR</td>
+            <td><span class="next">не совместим</span></td>
+            <td><span class="next">совместим</span></td>
+        </tr>
+    </table>
+    <!-- <span class="next"><br>На крайний случай. Если многодоменная конфигурация, то можно по рекомендациям OWASP использовать SessionStorage + fingerprint.</span>-->
+</section>
+
+<section class="slide ">
+    <h2>Как читать данные с токена?</h2>
+
+    <table class="next">
+        <tr>
+            <th width="50%">В local storage</th>
+            <th>В cookie HttpOnly</th>
+        </tr>
+        <tr class="next">
+            <td><span class="next">Плохо (XSS)</span></td>
+            <td><span class="next">невозможно т.к. httpOnly</span></td>
+        </tr>
+    </table>
+
+    <ul class="next">
+        <li>Токен должен быть зашифрован!</li>
+        <li>Делаем доп запрос на сервер чтобы его расшифровать (Можно использовать BFF)</li>
+    </ul>
+</section>
+
+<section class="slide ">
+    <h2>Сколько должен жить JWT токен?</h2>
+    <p>Best Practices: 15-30min</p>
+</section>
+
+<section class="slide ">
+    <h2>А как его обновлять?</h2>
+    <ul>
+        <li>Refresh token</li>
+        <li>Хранение аналогично: localStorage / cookie httpOnly</li>
+        <li>Длительность: должен быть больше чем access token</li>
+    </ul>
+
+    @todo схемка
+</section>
+
+
+<section class="slide ">
+    <h2>Механика обновления access token</h2>
+    <table class="next">
+        <tr>
+            <th width="50%">В local storage</th>
+            <th>В cookie HttpOnly</th>
+        </tr>
+        <tr class="next">
+            <td><span class="next">response interceptor клиента на 401, с перезапросом</span></td>
+            <td><span class="next">происходит фоном на бекенде</span></td>
+        </tr>
+    </table>
+</section>
+
+<!--
+<section class="slide ">
+    <h2>Механика обновления access token</h2>
+    <table>
+        <tr style="vertical-align: top">
+            <td>
+                 <pre style="font-size: 5px;"><code>
+import { ErrorHandler, Injectable } from "@angular/core"
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http"
+
+import { catchError, switchMap, take, tap } from "rxjs/operators"
+import { BrowserStorageService } from "../shared-services/browser-storage.service"
+import { BrowserStorageVariables } from "../model"
+import { Observable, of, Subject, throwError } from "rxjs"
+import { Store } from "@ngrx/store"
+import { RootState } from "../../../web-navigator/app/core/model"
+import { authPath } from "../constants"
+import { AuthService } from "../../../web-navigator/app/auth/services/auth.service"
+import * as fromActions from "../../../web-navigator/app/core/actions"
+
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+    constructor(private browserStorage: BrowserStorageService,
+                private errorHandler: ErrorHandler,
+                private store$: Store<RootState>,
+                private authService: AuthService) {
+    }
+
+    /**
+     * Флаг говорящий о том что запрос на получение нового access токена в процессе
+     */
+    private isGetAccessTokenGetInProgress: boolean = false
+
+    /**
+     * Уведомитель, который сообщает что получен новый access токен
+     */
+    private accessToken$: Subject<void> = new Subject<void>()
+
+    public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<any> {
+        return this.getRequest(req, next).pipe(
+            catchError((error: HttpErrorResponse) => {
+                if (error.url === null) {
+                    return throwError(error)
+                }
+
+                if (error.url.includes(authPath)) {
+                    this.isGetAccessTokenGetInProgress = false
+                    this.store$.dispatch(fromActions.destroyApp())
+                    return of(null)
+                }
+
+</code></pre>
+            </td>
+            <td>
+                 <pre style="font-size: 5px;"><code>
+/**
+ * Если код ошибки не 401, значить что-то не так,
+ * никак не связанное с авторизацией.
+ * Просто прокидываем ошибку дальше
+ */
+if (error.status !== 401) {
+    this.errorHandler.handleError(error)
+    return throwError(error)
+}
+
+/**
+ * Если получение нового access в процессе,
+ * то кидаем пришедший запрос в очередь ожидания
+ */
+if (this.isGetAccessTokenGetInProgress) {
+    return this.accessToken$.pipe(
+        take(1),
+        switchMap(() => this.getRequest(req, next))
+    )
+}
+
+/**
+ * Если код добрался сюда, пройдя все проверки,
+ * то это означает что именно на этом запросе сгорел access токен,
+ * так что мы говорим что получение в процессе и идем на сервер
+ * авторизации за новым
+ */
+this.isGetAccessTokenGetInProgress = true
+
+/**
+ * Достаем refresh токен
+ */
+const refreshToken: string | null = this.browserStorage.onGet(BrowserStorageVariables.refreshToken)
+const orgKey: string | null = this.browserStorage.onGet(BrowserStorageVariables.orgKey)
+
+if (refreshToken === null || orgKey === null) {
+    return throwError(new Error("Tokens not defined"))
+}
+
+    </code></pre>
+            </td>
+            <td>
+                 <pre style="font-size: 5px;"><code>
+
+
+            return this.authService.authorizeByRefresh({refreshToken, orgKey}).pipe(
+                tap((v) => {
+                    /**
+                     * Сохраняем новые refresh и access токены
+                     */
+                    this.browserStorage.onSet(BrowserStorageVariables.accessToken, v.access_token)
+
+                    /**
+                     * Говорим очереди всех запросов, что теперь можно
+                     * выполняться
+                     */
+                    this.accessToken$.next()
+                    this.isGetAccessTokenGetInProgress = false
+                }),
+                switchMap(() => {
+                    /**
+                     * Выполняем, тот самый запрос на котором
+                     * мы впервые узнали что токен сгорел
+                     */
+                    return this.getRequest(req, next)
+                })
+            )
+        })
+    )
+}
+
+private getRequest(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const accessToken: string | null = this.browserStorage.onGet(BrowserStorageVariables.accessToken)
+
+    if (accessToken === null) {
+        return next.handle(req)
+    }
+
+    return next.handle(req.clone({headers: req.headers.set("Authorization", `Bearer ${accessToken}`)}))
+}
+}
+    </code></pre>
+            </td>
+        </tr>
+    </table>
+
+</section>
+-->
+
+<section class="slide ">
+    <h2>Ротация Refresh токенов</h2>
+    <ul>
+        <li>При запросе нового access token, выдавать в т.ч. новый refresh token, делая старый устаревшим</li>
+        <li class="next">Идем дальше: объединять цепочку токенов в семейство. При попытке использовании старого refresh token - убивать всю семью.</li>
+        <li class="next">И все это больно делать если до этого мы сохраняли токен в storage, опять прийдется работать ручками</li>
+    </ul>
+</section>
+
+<section class="slide ">
+    <h2><span>Как отозвать токен?</span></h2>
+    <ul>
+        <li class="next">blacklist (OWASP)</li>
+    </ul>
+</section>
+
+<section class="slide ">
+    <h2 class="shout shrink fs70">blacklist? Но как же stateless?</h2>
+</section>
+
+
+<section class="slide ">
+    <h2><span>Как защитить токен от кражи? (Token Sidejacking)</span></h2>
+    <ul>
+        <li class="next">csrf token в виде отдельной http_only cookie в котором хранить user context + random SHA256</li>
+    </ul>
+</section>
+
+
+<section class="slide ">
+    <h2><span>JWT другие проблемы</span></h2>
+    <ul>
+        <li>Уязвимости крипографии</li>
+        <li>Множество векторов атак: Signature Forgery, Token Hijacking, Replay Attack, Key Exposure, Brute Force Key Attack, Key ID Injection, JWT Injection, CSRF, Leakage of Sensitive Data</li>
+        <li>Прежде чем ее использовать убедитесь что вам это точно (!) нужно. Может просто сессии?</li>
+    </ul>
+</section>
+
+
+<section class="slide ">
+    <h2><span>Custom JWT авторизация: выводы</span></h2>
+    <ul style="font-size: 23px;">
+        <li>Фронтендер должен обладать знаниями в области основ безопасности авторизации JWT</li>
+        <li class="next">В данном случае т.к. у нас есть персданные и приложение публичное - по хорошему сказать бекендеру переделать на coockie httpOnly</li>
+        <li class="next">Бонусом: сильно меньше велосипедного кода на фронтенде, клиент более глупый и тонкий</li>
+        <li class="next">Вариант с localstorage можно только во внутренней доверенной сети и для приложений без чувствительных данных</li>
+    </ul>
+</section>
+
+
+
+<section class="slide black">
+    <h2 class="shout" style="color: #ffffff; position: relative; z-index: 2;">Session</h2>
+    <img class="cover" src="pictures/variants-auth.jpg" alt="">
+</section>
+
+<section class="slide ">
+    <h2>Session аутентификация</h2>
+    <img width="400" style="float: right" src="pictures/session-auth.svg" alt="">
+    <ul class="clear-list">
+        <li><i class="plus"></i> Простота</li>
+        <li><i class="plus"></i> Проще обеспечить безопасность</li>
+        <li><i class="minus"></i> Хуже подходит SOA/MSA</li>
+    </ul>
+</section>
+
+<section class="slide ">
+    <h2>Session</h2>
+    <img width="400" style="float: right" src="pictures/session-auth.svg" alt="">
+    <ul class="clear-list">
+        <li><i class="plus"></i> Простота</li>
+        <li><i class="plus"></i> Проще обеспечить безопасность</li>
+        <li><i class="minus"></i> Хуже подходит SOA/MSA</li>
+    </ul>
+</section>
+
+<section class="slide ">
+    <img src="pictures/bff.drawio.svg" width="700" class="cover" alt="">
+</section>
+
+<section class="slide ">
+    <img src="pictures/authjs.png" class="cover" alt="">
+</section>
+
+<section class="slide ">
+    <h2 class="  fs70">Разбор Auth.JS: Безопасность</h2>
+    <ol class="clear-list">
+        <li class="next"><i class="plus"></i> реализовано шифрование JWS / JWE / JWK</li>
+        <li class="next"><i class="plus"></i> httpOnly SameSite Secure cookie</li>
+        <li class="next"><i class="plus"></i> запрос данных расшифрованной cookie с сервера</li>
+        <li class="next"><i class="plus"></i> Синхронизация вкладок, автопроверка, поддержка активности</li>
+        <li class="next"><i class="plus"></i> CSRF</li>
+        <li class="next"><i class="plus"></i> Ротация токенов</li>
+        <li class="next"><i class="minus"></i> Нет Refresh токена => нет механизма отзыва токенов</li>
+    </ol>
+</section>
+
+<section class="slide ">
+    <h2 class="fs70">Разбор Auth.JS: Функциональность</h2>
+    <ol>
+        <li>Готовые обвязки с 50+ разными провайдерами авторизации (facebook, google, discord, github, yandex, vk, azure, atlassian, OAuth, OIDC и мн другие)</li>
+        <li>Провайдер авторизации через email</li>
+        <li>Готовые удобные хуки</li>
+        <li>SSR Friendly</li>
+        <li>Провайдеры к базам данных: typeorm, prisma, sequilize и пр</li>
+<!--        <li>Из коробки дружит с Nextjs</li>-->
+    </ol>
+</section>
+
+
+
+
+
+
+
+
+
+
+<!---->
+<!---->
+<!---->
+<!---->
+<!---->
+
+
+<section class="slide">
+    <h2>Plain text on your slides</h2>
+    <p>
         Lorem ipsum dolor sit amet, consectetur <a href="#4">adipisicing</a> elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
         <em>quis nostrud</em> exercitation ullamco laboris <strong>nisi ut aliquip</strong> ex ea
@@ -169,59 +642,59 @@
         cillum <b>dolore</b> eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
         proident, sunt in <code>&lt;culpa&gt;</code> qui officia deserunt mollit anim id est
         laborum.
-      </p>
-    </section>
+    </p>
+</section>
 
-    <section class="slide">
-      <h2>Two columns if you like</h2>
-      <div class="columns two">
+<section class="slide">
+    <h2>Two columns if you like</h2>
+    <div class="columns two">
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
+            ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.
         </p>
         <p>
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-          nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
         </p>
-      </div>
-    </section>
+    </div>
+</section>
 
-    <section class="slide">
-      <h2>All kind of lists</h2>
-      <ol>
+<section class="slide">
+    <h2>All kind of lists</h2>
+    <ol>
         <li>Simple lists are marked with bullets</li>
         <li>Ordered lists begin with a number</li>
         <li>
-          You can even nest lists one inside another
-          <ul>
-            <li>Or mix their types</li>
-            <li>But do not go too far</li>
-            <li>Otherwise audience will be bored</li>
-          </ul>
+            You can even nest lists one inside another
+            <ul>
+                <li>Or mix their types</li>
+                <li>But do not go too far</li>
+                <li>Otherwise audience will be bored</li>
+            </ul>
         </li>
         <li>Look, seven rows exactly!</li>
-      </ol>
-    </section>
+    </ol>
+</section>
 
-    <section class="slide">
-      <h2>Serious citations</h2>
-      <figure>
+<section class="slide">
+    <h2>Serious citations</h2>
+    <figure>
         <blockquote>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-            dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
-          </p>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
+            </p>
         </blockquote>
         <figcaption>Marcus Tullius Cicero</figcaption>
-      </figure>
-    </section>
+    </figure>
+</section>
 
-    <section class="slide">
-      <h2>Code samples</h2>
-      <pre>
+<section class="slide">
+    <h2>Code samples</h2>
+    <pre>
           <code>&lt;!DOCTYPE html&gt;</code>
           <code class="mark">&lt;html lang="en"&gt;</code>
           <code><mark>&lt;head&gt;</mark> <span class="comment">&lt;!--Comment--&gt;</span></code>
@@ -230,116 +703,119 @@
           <code>    &lt;link rel="stylesheet" href="screen.css"&gt;</code>
           <code><mark>&lt;/head&gt;</mark></code>
       </pre>
-    </section>
+</section>
 
-    <section class="slide">
-      <h2>Even tables</h2>
-      <table>
+<section class="slide">
+    <h2>Even tables</h2>
+    <table>
         <tr>
-          <th scope="col">Locavore</th>
-          <th>Umami</th>
-          <th>Helvetica</th>
-          <th>Vegan</th>
+            <th scope="col">Locavore</th>
+            <th>Umami</th>
+            <th>Helvetica</th>
+            <th>Vegan</th>
         </tr>
         <tr>
-          <th scope="row">Fingerstache</th>
-          <td>Kale</td>
-          <td>Chips</td>
-          <td>Keytar</td>
+            <th scope="row">Fingerstache</th>
+            <td>Kale</td>
+            <td>Chips</td>
+            <td>Keytar</td>
         </tr>
         <tr>
-          <th scope="row">Sriracha</th>
-          <td>Gluten-free</td>
-          <td>Ennui</td>
-          <td>Keffiyeh</td>
+            <th scope="row">Sriracha</th>
+            <td>Gluten-free</td>
+            <td>Ennui</td>
+            <td>Keffiyeh</td>
         </tr>
         <tr>
-          <th scope="row">Thundercats</th>
-          <td>Jean</td>
-          <td>Shorts</td>
-          <td>Biodiesel</td>
+            <th scope="row">Thundercats</th>
+            <td>Jean</td>
+            <td>Shorts</td>
+            <td>Biodiesel</td>
         </tr>
         <tr>
-          <th scope="row">Terry</th>
-          <td>Richardson</td>
-          <td>Swag</td>
-          <td>Blog</td>
+            <th scope="row">Terry</th>
+            <td>Richardson</td>
+            <td>Swag</td>
+            <td>Blog</td>
         </tr>
-      </table>
-      <p>It’s good to have information organized.</p>
-    </section>
+    </table>
+    <p>It’s good to have information organized.</p>
+</section>
 
-    <section class="slide" id="picture">
-      <h2>Pictures</h2>
-      <figure>
+<section class="slide" id="picture">
+    <h2>Pictures</h2>
+    <figure>
         <img
-          class="cover"
-          src="pictures/picture.jpg"
-          alt="Orange typewriter on a wooden table close-up"
+            class="cover"
+            src="pictures/picture.jpg"
+            alt="Orange typewriter on a wooden table close-up"
         />
         <figcaption class="copyright right white">
-          <a href="https://fiftyfootshadows.net">© John Carey</a>
+            <a href="https://fiftyfootshadows.net">© John Carey</a>
         </figcaption>
-      </figure>
-      <style>
-        #picture h2 {
-          color: white;
-        }
-      </style>
-    </section>
+    </figure>
+    <style>
+		#picture h2 {
+			color: white;
+		}
+    </style>
+</section>
 
-    <section class="slide">
-      <h2 class="shout shrink">You can even shout this way</h2>
-    </section>
+<section class="slide">
+    <h2 class="shout shrink">You can even shout this way</h2>
+</section>
 
-    <section class="slide">
-      <h2>Inner navigation</h2>
-      <ol>
+<section class="slide">
+    <h2>Inner navigation</h2>
+    <ol>
         <li>Lets you reveal list items one by one</li>
         <li class="next">To keep some key points</li>
         <li class="next">In secret from audience</li>
         <li class="next">But it will work only once</li>
         <li class="next">Nobody wants to see the same joke twice</li>
-      </ol>
-    </section>
+    </ol>
+</section>
 
-    <section class="slide clear" id="last-slide">
-      <h2>Пожалуйста, оставьте свой отзыв</h2>
-      <p>
-        <b>Василий Пупкин</b><br />
-        ACME Corporation<br />
-      </p>
-      <p>
+<section class="slide clear" id="last-slide">
+    <h2>Пожалуйста, оставьте свой отзыв</h2>
+    <p>
+        <b>Иван Поддубный</b><br />
+        CTO Вебпрактик<br />
+    </p>
+    <p>
         https://github.com/shower/shower<br>
-      </p>
-      <img src="pictures/qr.png" alt="" />
-      <style>
-        #last-slide {
-          background: url("pictures/fc24-title.png") no-repeat center center;
-          background-size: contain;
-        }
-        #last-slide h2 {
-          font-size: 62px;
-          width: 593px;
-        }
-        #last-slide p {
-          line-height: initial;
-        }
-        #last-slide img {
-          position: absolute;
-          right: 40px;
-          top: 40px;
-          width: 250px;
-        }
-      </style>
-    </section>
+    </p>
+    <img src="pictures/qr.png" alt="" />
+    <style>
+		#last-slide {
+			background: url("pictures/fc24-title.png") no-repeat center center;
+			background-size: contain;
+		}
 
-    <footer class="badge">
-      <a href="https://github.com/shower/shower">Fork me on GitHub</a>
-    </footer>
+		#last-slide h2 {
+			font-size: 62px;
+			width: 593px;
+		}
 
-    <div class="progress"></div>
+		#last-slide p {
+			line-height: initial;
+		}
 
-    <script src="node_modules/@shower/core/dist/shower.js"></script>
-  </body>
+		#last-slide img {
+			position: absolute;
+			right: 40px;
+			top: 40px;
+			width: 250px;
+		}
+    </style>
+</section>
+
+<footer class="badge">
+    <a href="https://github.com/shower/shower">Fork me on GitHub</a>
+</footer>
+
+<div class="progress"></div>
+
+<script src="node_modules/@shower/core/dist/shower.js"></script>
+</body>
 </html>
