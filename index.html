@@ -175,8 +175,8 @@
 <section class="slide ">
     <h2><span>Вопросы в зал</span></h2>
     <ul>
-        <li>Кто из вас реализовывал аутентификацию в SPA приложениях?</li>
-        <li class="next">Кто делал stateless авторизацию на JWT токенах?</li>
+        <li>Кто из вас реализовывал авторизацию в SPA приложениях?</li>
+        <li class="next">Кто делал авторизацию на JWT токенах?</li>
         <li class="next">Кто читал OWASP рекомендации (или RFC 8725 JSON Web Token Best Current Practices) как сделать это безопасно?</li>
     </ul>
 </section>
@@ -186,7 +186,7 @@
     <ul>
         <li class="next">Масса статей которые очень поверхностно разбирают лишь самые базовые аспекты</li>
         <li class="next">Отсутствие знаний по грамотной эксплуатации <br> и защите токенов</li>
-        <li class="next">Наваять как скажет бекендер, который на поверку не всегда может быть грамотен</li>
+        <li class="next">Следовать предписаниям велосипеда бекендеров, которые также часто не имеют должной экспертизы</li>
     </ul>
 </section>
 
@@ -195,7 +195,16 @@
 </section>
 
 <section class="slide ">
-    <h2 class="shout" style="font-size: 50px; padding: 0 70px; width: auto;">Ошибки реализации авторизации каждый год входят в ТОП-10 разновиденостей уязвимостей OWASP</h2>
+    <table style="margin-top: 150px">
+        <tr>
+            <td>
+                <img style="width: 300px; margin-right: 50px"  src="pictures/OWASP-Top-10-logo.png" alt="">
+            </td>
+            <td >
+                <h2 style="font-size: 40px; ">Ошибки авторизации <br> каждый год входят <br> в ТОП-10 разновиденостей <br> уязвимостей OWASP</h2>
+            </td>
+        </tr>
+    </table>
 </section>
 
 <section class="slide ">
@@ -223,7 +232,7 @@
 </section>
 
 <section class="slide clear black">
-    <h2 style="position: relative; z-index: 2;">Сессии, OIDC/oAuth, custom JWT</h2>
+    <h2 style="position: relative; z-index: 2;">Сессии, OIDC/OAuth, custom JWT</h2>
     <img class="cover" src="pictures/variants-auth.jpg" alt="">
 </section>
 
@@ -231,7 +240,6 @@
     <h2 class="shout" style="color: #ffffff; position: relative; z-index: 2;">Custom JWT Auth</h2>
     <img class="cover" src="pictures/variants-auth.jpg" alt="">
 </section>
-
 
 <section class="slide ">
     <h2>JWT</h2>
@@ -245,9 +253,7 @@
     <ul class="clear-list next">
         <li><i class="plus"></i> Простота</li>
         <li><i class="plus"></i> Проще обеспечить безопасность</li>
-        <li><i class="minus"></i> Скорость</li>
-        <li><i class="minus"></i> Масштабирование</li>
-        <li><i class="minus"></i> Плохо подходит SOA/MSA</li>
+        <li><i class="minus"></i> Плохо подходит SOA/MSA (потери скорости, проблемы с маштабированием)</li>
     </ul>
 </section>
 
@@ -264,13 +270,12 @@
 
 <section class="slide ">
     <h2 class="shout shrink" style="font-size: 60px;">Бекендер выплевывает вам JWT токен <br> в ответе на метод авторизации...</h2>
+    <!--  @todo вывести сваггер  -->
 </section>
-
 
 <section class="slide ">
     <h2 class="shout shrink" style="font-size: 60px;">Какие вопросы перед нами встают?</h2>
 </section>
-
 
 <section class="slide ">
     <h2>Где хранить JWT токен на клиенте?</h2>
@@ -307,6 +312,11 @@
             <td>SSR</td>
             <td><span class="next">не совместим</span></td>
             <td><span class="next">совместим</span></td>
+        </tr>
+        <tr class="next">
+            <td>Место</td>
+            <td><span class="next">много</span></td>
+            <td><span class="next">ограничено 4кб</span></td>
         </tr>
     </table>
     <!-- <span class="next"><br>На крайний случай. Если многодоменная конфигурация, то можно по рекомендациям OWASP использовать SessionStorage + fingerprint.</span>-->
@@ -348,7 +358,6 @@
     @todo схемка
 </section>
 
-
 <section class="slide ">
     <h2>Механика обновления access token</h2>
     <table class="next">
@@ -362,150 +371,6 @@
         </tr>
     </table>
 </section>
-
-<!--
-<section class="slide ">
-    <h2>Механика обновления access token</h2>
-    <table>
-        <tr style="vertical-align: top">
-            <td>
-                 <pre style="font-size: 5px;"><code>
-import { ErrorHandler, Injectable } from "@angular/core"
-import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http"
-
-import { catchError, switchMap, take, tap } from "rxjs/operators"
-import { BrowserStorageService } from "../shared-services/browser-storage.service"
-import { BrowserStorageVariables } from "../model"
-import { Observable, of, Subject, throwError } from "rxjs"
-import { Store } from "@ngrx/store"
-import { RootState } from "../../../web-navigator/app/core/model"
-import { authPath } from "../constants"
-import { AuthService } from "../../../web-navigator/app/auth/services/auth.service"
-import * as fromActions from "../../../web-navigator/app/core/actions"
-
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-    constructor(private browserStorage: BrowserStorageService,
-                private errorHandler: ErrorHandler,
-                private store$: Store<RootState>,
-                private authService: AuthService) {
-    }
-
-    /**
-     * Флаг говорящий о том что запрос на получение нового access токена в процессе
-     */
-    private isGetAccessTokenGetInProgress: boolean = false
-
-    /**
-     * Уведомитель, который сообщает что получен новый access токен
-     */
-    private accessToken$: Subject<void> = new Subject<void>()
-
-    public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<any> {
-        return this.getRequest(req, next).pipe(
-            catchError((error: HttpErrorResponse) => {
-                if (error.url === null) {
-                    return throwError(error)
-                }
-
-                if (error.url.includes(authPath)) {
-                    this.isGetAccessTokenGetInProgress = false
-                    this.store$.dispatch(fromActions.destroyApp())
-                    return of(null)
-                }
-
-</code></pre>
-            </td>
-            <td>
-                 <pre style="font-size: 5px;"><code>
-/**
- * Если код ошибки не 401, значить что-то не так,
- * никак не связанное с авторизацией.
- * Просто прокидываем ошибку дальше
- */
-if (error.status !== 401) {
-    this.errorHandler.handleError(error)
-    return throwError(error)
-}
-
-/**
- * Если получение нового access в процессе,
- * то кидаем пришедший запрос в очередь ожидания
- */
-if (this.isGetAccessTokenGetInProgress) {
-    return this.accessToken$.pipe(
-        take(1),
-        switchMap(() => this.getRequest(req, next))
-    )
-}
-
-/**
- * Если код добрался сюда, пройдя все проверки,
- * то это означает что именно на этом запросе сгорел access токен,
- * так что мы говорим что получение в процессе и идем на сервер
- * авторизации за новым
- */
-this.isGetAccessTokenGetInProgress = true
-
-/**
- * Достаем refresh токен
- */
-const refreshToken: string | null = this.browserStorage.onGet(BrowserStorageVariables.refreshToken)
-const orgKey: string | null = this.browserStorage.onGet(BrowserStorageVariables.orgKey)
-
-if (refreshToken === null || orgKey === null) {
-    return throwError(new Error("Tokens not defined"))
-}
-
-    </code></pre>
-            </td>
-            <td>
-                 <pre style="font-size: 5px;"><code>
-
-
-            return this.authService.authorizeByRefresh({refreshToken, orgKey}).pipe(
-                tap((v) => {
-                    /**
-                     * Сохраняем новые refresh и access токены
-                     */
-                    this.browserStorage.onSet(BrowserStorageVariables.accessToken, v.access_token)
-
-                    /**
-                     * Говорим очереди всех запросов, что теперь можно
-                     * выполняться
-                     */
-                    this.accessToken$.next()
-                    this.isGetAccessTokenGetInProgress = false
-                }),
-                switchMap(() => {
-                    /**
-                     * Выполняем, тот самый запрос на котором
-                     * мы впервые узнали что токен сгорел
-                     */
-                    return this.getRequest(req, next)
-                })
-            )
-        })
-    )
-}
-
-private getRequest(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const accessToken: string | null = this.browserStorage.onGet(BrowserStorageVariables.accessToken)
-
-    if (accessToken === null) {
-        return next.handle(req)
-    }
-
-    return next.handle(req.clone({headers: req.headers.set("Authorization", `Bearer ${accessToken}`)}))
-}
-}
-    </code></pre>
-            </td>
-        </tr>
-    </table>
-
-</section>
--->
 
 <section class="slide ">
     <h2>Ротация Refresh токенов</h2>
@@ -553,9 +418,9 @@ private getRequest(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEve
         <li class="next">В данном случае т.к. у нас есть персданные и приложение публичное - по хорошему сказать бекендеру переделать на coockie httpOnly</li>
         <li class="next">Бонусом: сильно меньше велосипедного кода на фронтенде, клиент более глупый и тонкий</li>
         <li class="next">Вариант с localstorage можно только во внутренней доверенной сети и для приложений без чувствительных данных</li>
+        <li class="next">Нет готовых библиотек которые реализуют за вас бестпрактисы на фронтенде</li>
     </ul>
 </section>
-
 
 
 <section class="slide black">
@@ -565,16 +430,6 @@ private getRequest(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEve
 
 <section class="slide ">
     <h2>Session аутентификация</h2>
-    <img width="400" style="float: right" src="pictures/session-auth.svg" alt="">
-    <ul class="clear-list">
-        <li><i class="plus"></i> Простота</li>
-        <li><i class="plus"></i> Проще обеспечить безопасность</li>
-        <li><i class="minus"></i> Хуже подходит SOA/MSA</li>
-    </ul>
-</section>
-
-<section class="slide ">
-    <h2>Session</h2>
     <img width="400" style="float: right" src="pictures/session-auth.svg" alt="">
     <ul class="clear-list">
         <li><i class="plus"></i> Простота</li>
@@ -594,9 +449,9 @@ private getRequest(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEve
 <section class="slide ">
     <h2 class="  fs70">Разбор Auth.JS: Безопасность</h2>
     <ol class="clear-list">
-        <li class="next"><i class="plus"></i> реализовано шифрование JWS / JWE / JWK</li>
+        <li class="next"><i class="plus"></i> Реализовано шифрование JWS / JWE / JWK</li>
         <li class="next"><i class="plus"></i> httpOnly SameSite Secure cookie</li>
-        <li class="next"><i class="plus"></i> запрос данных расшифрованной cookie с сервера</li>
+        <li class="next"><i class="plus"></i> Запрос данных расшифрованной cookie с сервера</li>
         <li class="next"><i class="plus"></i> Синхронизация вкладок, автопроверка, поддержка активности</li>
         <li class="next"><i class="plus"></i> CSRF</li>
         <li class="next"><i class="plus"></i> Ротация токенов</li>
@@ -605,176 +460,251 @@ private getRequest(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEve
 </section>
 
 <section class="slide ">
+    <img src="pictures/authjs-providers.png" class="cover" alt="">
+</section>
+
+<section class="slide ">
     <h2 class="fs70">Разбор Auth.JS: Функциональность</h2>
     <ol>
-        <li>Готовые обвязки с 50+ разными провайдерами авторизации (facebook, google, discord, github, yandex, vk, azure, atlassian, OAuth, OIDC и мн другие)</li>
-        <li>Провайдер авторизации через email</li>
-        <li>Готовые удобные хуки</li>
+        <li>Готовые обвязки с 50+ разными провайдерами авторизации</li>
         <li>SSR Friendly</li>
-        <li>Провайдеры к базам данных: typeorm, prisma, sequilize и пр</li>
-<!--        <li>Из коробки дружит с Nextjs</li>-->
+        <li>Готовые удобные хуки (или другое API для вашего Frontend Framework)</li>
+        <li>Автоматическая ревализация</li>
+        <li>Синхронизация вкладок</li>
+        <!--        <li>Провайдеры к базам данных: typeorm, prisma, sequilize и пр</li>-->
+        <!--        <li>Из коробки дружит с Nextjs</li>-->
     </ol>
 </section>
 
-
-
-
-
-
-
-
-
-
-<!---->
-<!---->
-<!---->
-<!---->
-<!---->
-
-
-<section class="slide">
-    <h2>Plain text on your slides</h2>
-    <p>
-        Lorem ipsum dolor sit amet, consectetur <a href="#4">adipisicing</a> elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-        <em>quis nostrud</em> exercitation ullamco laboris <strong>nisi ut aliquip</strong> ex ea
-        commodo consequat. Duis aute irure <i>dolor</i> in reprehenderit in voluptate velit esse
-        cillum <b>dolore</b> eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-        proident, sunt in <code>&lt;culpa&gt;</code> qui officia deserunt mollit anim id est
-        laborum.
-    </p>
+<section class="slide ">
+    <h2>Как этом может работать</h2>
+    <img src="pictures/nextauth-auth.svg" width="700" class="cover" alt="">
 </section>
 
-<section class="slide">
-    <h2>Two columns if you like</h2>
-    <div class="columns two">
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
-            ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.
-        </p>
-        <p>
-            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
-        </p>
-    </div>
+<section class="slide ">
+    <h2>Session: выводы</h2>
+    <ul>
+        <li>Этот метод является предпочтительным практически всегда когда у вас нет микросервисов</li>
+        <li>Если у вас есть BFF, SSR и вам нужен быстрый старт - можно взять готовые инструменты инкапсулирующие многую сложность (authJS, nextAuth, nuxtAuth)</li>
+    </ul>
 </section>
 
-<section class="slide">
-    <h2>All kind of lists</h2>
-    <ol>
-        <li>Simple lists are marked with bullets</li>
-        <li>Ordered lists begin with a number</li>
-        <li>
-            You can even nest lists one inside another
+
+<section class="slide black">
+    <h2 class="shout" style="color: #ffffff; position: relative; z-index: 2;">OAuth/OIDC</h2>
+    <img class="cover" src="pictures/variants-auth.jpg" alt="">
+</section>
+
+<section class="slide ">
+    <h2>OAuth/OIDC</h2>
+    <ul>
+        <li class="next">OAuth &mdash; стандарт
+            <mark>авторизации</mark>
+        </li>
+        <li class="next">Open ID Connect (OIDC) &mdash; стандарт
+            <mark>аутентификации</mark>
+                         , построенный на базе OAuth
+        </li>
+        <li class="next">Использование OAuth в качестве аутентификации считается не корректным, и может приводить к дополнительным уязвимостям и векторам атаки</li>
+    </ul>
+</section>
+
+<!--<section class="slide ">-->
+<!--    <table style="font-size: 13px">-->
+<!--        <tr>-->
+<!--            <th>Сценарий</th>-->
+<!--            <th>OAuth 2.0</th>-->
+<!--            <th>OpenID Connect (OIDC)</th>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <td>Аутентификация пользователя</td>-->
+<!--            <td>Не подходит, нужен OIDC</td>-->
+<!--            <td>Да, используется для проверки личности пользователя</td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <td>Доступ к защищённым ресурсам</td>-->
+<!--            <td>Да, делегирование прав доступа к ресурсам</td>-->
+<!--            <td>Да, через OAuth, но добавляется идентификация пользователя</td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <td>Single Sign-On (SSO)</td>-->
+<!--            <td>Нет</td>-->
+<!--            <td>Да, используется для SSO</td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <td>Аутентификация через соцсети</td>-->
+<!--            <td>Нет</td>-->
+<!--            <td>Да, например, через Google, Facebook и т.д.</td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <td>Мобильные приложения для API-доступа</td>-->
+<!--            <td>Да, делегирование доступа</td>-->
+<!--            <td>Только если требуется аутентификация</td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <td>Доступ к API от имени пользователя</td>-->
+<!--            <td>Да, позволяет выполнять действия от имени пользователя</td>-->
+<!--            <td>Да, через OAuth, плюс идентификация пользователя</td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <td>Безопасная идентификация пользователя</td>-->
+<!--            <td>Нет, только авторизация</td>-->
+<!--            <td>Да, через ID-токен</td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <td>Обеспечение безопасности сессий</td>-->
+<!--            <td>Нет</td>-->
+<!--            <td>Да, используется для управления сессиями</td>-->
+<!--        </tr>-->
+<!--    </table>-->
+<!--</section>-->
+
+<section class="slide ">
+    <h2>Применимость</h2>
+    <ul style="font-size: 20px;">
+        <li class="next">OIDC чаще всего используется в группах приложений когда сервер авторизации (IDP) вынесен в отдельную сущность. Когда нужно SSO.
+            <br>
+                         Примеры:
             <ul>
-                <li>Or mix their types</li>
-                <li>But do not go too far</li>
-                <li>Otherwise audience will be bored</li>
+                <li>Поставлен корпоративный KeyCloack который используется для семейства корпоративных приложений</li>
+                <li>Или к примеру вы Яндекс, mail который вынес IDP во внешний сервис</li>
             </ul>
         </li>
-        <li>Look, seven rows exactly!</li>
-    </ol>
+    </ul>
 </section>
 
-<section class="slide">
-    <h2>Serious citations</h2>
-    <figure>
-        <blockquote>
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-                dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
-            </p>
-        </blockquote>
-        <figcaption>Marcus Tullius Cicero</figcaption>
-    </figure>
+<section class="slide ">
+    <h2>Применимость</h2>
+    <ul style="font-size: 20px;">
+        <li class="next">Используются когда использую внешних поставщиков <br> (Google, Facebook, Яндекс)</li>
+        <li class="next">Используются когда вы делегировали функцию аутентификации во внешние сервисы IDP (Auth0/Okta)</li>
+        <li class="next">Использование OIDC усложнит вашу архитектуру и добавит накладные расходы</li>
+        <li class="next">Не рационально использовать когда у вас нет группы приложений</li>
+    </ul>
 </section>
 
-<section class="slide">
-    <h2>Code samples</h2>
-    <pre>
-          <code>&lt;!DOCTYPE html&gt;</code>
-          <code class="mark">&lt;html lang="en"&gt;</code>
-          <code><mark>&lt;head&gt;</mark> <span class="comment">&lt;!--Comment--&gt;</span></code>
-          <code>    &lt;title&gt;Shower&lt;/title&gt;</code>
-          <code>    &lt;meta charset="<mark class="important">UTF-8</mark>"&gt;</code>
-          <code>    &lt;link rel="stylesheet" href="screen.css"&gt;</code>
-          <code><mark>&lt;/head&gt;</mark></code>
-      </pre>
+<section class="slide ">
+    <h2>OAuth/OIDC &mdash; не один стандарт</h2>
+    <ul>
+        <li class="next">OAuth/OIDC включает в себя десятки стандартов</li>
+        <li class="next">Не каждая реализация oAuth/OIDC имплементирует все стандарты</li>
+        <li class="next">Не каждая реализация ПРАВИЛЬНО реализует стандарты</li>
+    </ul>
+
+    hint: пример стандарта OIDC
 </section>
 
-<section class="slide">
-    <h2>Even tables</h2>
-    <table>
-        <tr>
-            <th scope="col">Locavore</th>
-            <th>Umami</th>
-            <th>Helvetica</th>
-            <th>Vegan</th>
-        </tr>
-        <tr>
-            <th scope="row">Fingerstache</th>
-            <td>Kale</td>
-            <td>Chips</td>
-            <td>Keytar</td>
-        </tr>
-        <tr>
-            <th scope="row">Sriracha</th>
-            <td>Gluten-free</td>
-            <td>Ennui</td>
-            <td>Keffiyeh</td>
-        </tr>
-        <tr>
-            <th scope="row">Thundercats</th>
-            <td>Jean</td>
-            <td>Shorts</td>
-            <td>Biodiesel</td>
-        </tr>
-        <tr>
-            <th scope="row">Terry</th>
-            <td>Richardson</td>
-            <td>Swag</td>
-            <td>Blog</td>
-        </tr>
-    </table>
-    <p>It’s good to have information organized.</p>
+<section class="slide ">
+    <img class="cover" src="pictures/OpenIDConnect-Map.png" alt="">
 </section>
 
-<section class="slide" id="picture">
-    <h2>Pictures</h2>
-    <figure>
-        <img
-            class="cover"
-            src="pictures/picture.jpg"
-            alt="Orange typewriter on a wooden table close-up"
-        />
-        <figcaption class="copyright right white">
-            <a href="https://fiftyfootshadows.net">© John Carey</a>
-        </figcaption>
-    </figure>
-    <style>
-		#picture h2 {
-			color: white;
-		}
-    </style>
+
+<section class="slide ">
+    <h2>Различие</h2>
+    @todo здесь рассказываю
+    <ul>
+        <li>Про разницу в токенах, эндпоинтах, FLOW</li>
+    </ul>
 </section>
 
-<section class="slide">
-    <h2 class="shout shrink">You can even shout this way</h2>
+<section class="slide ">
+    <h2>FLOW</h2>
+    @todo здесь поверхностно рассказываю про
+    Authorization Code Flow, Implicit Flow
+
+    <br>
+    <br>
+    <br>
+    Client Credentials Flow и Resource Owner Password Credentials Hybrid Flow упоминаю, но не раскрываю
 </section>
 
-<section class="slide">
-    <h2>Inner navigation</h2>
+<section class="slide ">
+    <h2>Уязвимости и способы защиты oAuth/OIDC</h2>
+    <ul>
+        <li>Вспоминаем часть защиты JWT</li>
+        <li>PKSE</li>
+        <li>nonce</li>
+    </ul>
+    @todo
+</section>
+
+<section class="slide ">
+    <h2>Готовые решения</h2>
     <ol>
-        <li>Lets you reveal list items one by one</li>
-        <li class="next">To keep some key points</li>
-        <li class="next">In secret from audience</li>
-        <li class="next">But it will work only once</li>
-        <li class="next">Nobody wants to see the same joke twice</li>
+        <li>Гейткиперы (для ряда решений вроде Keycloack / Ory)</li>
+        <li>Библиотеки</li>
     </ol>
 </section>
+
+<section class="slide ">
+    <h2><span class="gray">Гейткиперы</h2>
+    <img class="width-wrap" width="560" style="margin-bottom: 20px;" src="pictures/gatekeeper2.svg" alt="">
+</section>
+
+<section class="slide">
+    <h2><span class="gray">Гейткиперы</h2>
+    <ul class="clear-list">
+        <li><i class="plus"></i> Забирает почти всю боль с приложений бекенда и фронтенда</li>
+        <li class="next"><i class="plus"></i> Рекомендации по безопасности из коробки</li>
+        <li class="next"><i class="plus"></i> Нет дублирования кода авторизации в каждом микросервисе</li>
+    </ul>
+</section>
+
+<section class="slide ">
+    <h2><span class="gray">Где посмотреть подробнее:</h2>
+
+
+    <a style="border: 0; background: transparent" href="https://www.youtube.com/live/Llvnq-n43k0?si=6sNvD2vt54kruG9a&t=4901">
+        <img width="600" src="pictures/keycloack-methup.png" alt="Митап кейклоак x5group">
+    </a>
+
+    <img style="vertical-align: top" width="210" src="pictures/qr-code-meethup.svg" alt="QR code">
+</section>
+
+<section class="slide ">
+    <h2><span class="gray">Готовые библиотеки</h2>
+    <ol>
+        <li>AuthJS поддерживает OIDC, но не сертифицирован</li>
+        <li>Стоит доверять в 1 очередь сертифицированным и обновляемым решениям</li>
+    </ol>
+
+    @todo показать табличку дат библиотек
+</section>
+
+
+<section class="slide ">
+    <h2><span class="gray">Выводы</h2>
+    <ul style="font-size: 18px;">
+        <li class="next">Протоколы oAuth/OIDC подходят не для всех приложений, во многих случаях они могут быть слишком дороги и избыточны</li>
+        <li class="next">Авторизация на сессиях остается самой простой и надежной классикой</li>
+        <li class="next">Кастомная реализация на JWT токенах имеет право на жизнь, но нужно капитально взвесить все "за" и "против".</li>
+        <li class="next">Какой бы подход не был выбран - желательно не хранить токены в localStorage, хранить в httpOnly cookie</li>
+        <li class="next">Хороший разработчик должен поверхностно разбираться в вопросах безопасности чтобы его приложения не попадали на самые типовые ошибки</li>
+        <li class="next">При выборе готовых решений обязательно смотрите на их текущую актуальность, и следите за выходом их обновлений</li>
+    </ul>
+</section>
+
+
+<section class="slide ">
+    <h2><span class="gray">Полезные ссылки</h2>
+    <ul style="font-size: 18px;">
+        <li class="next">JWT Atack Playbook</li>
+        <li class="next">OWASP JWT Best Practices</li>
+        <li class="next">Authjs</li>
+        <li class="next">OIDC RFC</li>
+        <li class="next">oAuth RFC</li>
+        <li class="next">Gatekeeper</li>
+        <li class="next">etc</li>
+    </ul>
+</section>
+
+<!---->
+<!---->
+<!---->
+<!---->
+<!---->
+<!---->
+<!---->
 
 <section class="slide clear" id="last-slide">
     <h2>Пожалуйста, оставьте свой отзыв</h2>
@@ -783,7 +713,7 @@ private getRequest(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEve
         CTO Вебпрактик<br />
     </p>
     <p>
-        https://github.com/shower/shower<br>
+        https://north-leshiy.github.io/spa-auth-sec<br>
     </p>
     <img src="pictures/qr.png" alt="" />
     <style>
@@ -809,10 +739,6 @@ private getRequest(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEve
 		}
     </style>
 </section>
-
-<footer class="badge">
-    <a href="https://github.com/shower/shower">Fork me on GitHub</a>
-</footer>
 
 <div class="progress"></div>
 
