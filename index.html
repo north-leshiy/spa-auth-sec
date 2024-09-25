@@ -176,13 +176,13 @@
     <h2><span>Вопросы в зал</span></h2>
     <ul>
         <li>Кто из вас реализовывал авторизацию в SPA приложениях?</li>
-        <li class="next">Кто делал авторизацию на JWT токенах?</li>
+        <li class="next">Кто использовал для этого JWT токены?</li>
         <li class="next">Кто читал OWASP рекомендации (или RFC 8725 JSON Web Token Best Current Practices) как сделать это безопасно?</li>
     </ul>
 </section>
 
 <section class="slide ">
-    <h2><span>Проблемы первого раза для stateless авторизации в SPA</span></h2>
+    <h2><span>Проблемы первого раза для авторизации в SPA</span></h2>
     <ul>
         <li class="next">Масса статей которые очень поверхностно разбирают лишь самые базовые аспекты</li>
         <li class="next">Отсутствие знаний по грамотной эксплуатации <br> и защите токенов</li>
@@ -201,7 +201,7 @@
                 <img style="width: 300px; margin-right: 50px"  src="pictures/OWASP-Top-10-logo.png" alt="">
             </td>
             <td >
-                <h2 style="font-size: 40px; ">Ошибки авторизации <br> каждый год входят <br> в ТОП-10 разновиденостей <br> уязвимостей OWASP</h2>
+                <h2 style="font-size: 40px; ">Ошибки авторизации <br> каждый год входят <br> в ТОП-10 разновидностей <br> уязвимостей OWASP</h2>
             </td>
         </tr>
     </table>
@@ -253,7 +253,7 @@
     <ul class="clear-list next">
         <li><i class="plus"></i> Простота</li>
         <li><i class="plus"></i> Проще обеспечить безопасность</li>
-        <li><i class="minus"></i> Плохо подходит SOA/MSA (потери скорости, проблемы с маштабированием)</li>
+        <li><i class="minus"></i> Плохо подходит SOA/MSA (потери скорости, проблемы с масштабированием)</li>
     </ul>
 </section>
 
@@ -316,7 +316,7 @@
         <tr class="next">
             <td>Место</td>
             <td><span class="next">много</span></td>
-            <td><span class="next">ограничено 4кб</span></td>
+            <td><span class="next">ограничение 4кб</span></td>
         </tr>
     </table>
     <!-- <span class="next"><br>На крайний случай. Если многодоменная конфигурация, то можно по рекомендациям OWASP использовать SessionStorage + fingerprint.</span>-->
@@ -353,9 +353,10 @@
         <li>Refresh token</li>
         <li>Хранение аналогично: localStorage / cookie httpOnly</li>
         <li>Длительность: должен быть больше чем access token</li>
+        <li></li>
     </ul>
 
-    @todo схемка
+<!--    @todo схемка-->
 </section>
 
 <section class="slide ">
@@ -385,13 +386,12 @@
     <h2><span>Как отозвать токен?</span></h2>
     <ul>
         <li class="next">blacklist (OWASP)</li>
+        <li class="next">Но как же stateless?</li>
+        <li class="next">Можно хранить на конкретном bff в отдельном кеше (redis)</li>
+        <li class="next">А раз у нас все равно появляется состояние на bff, то может и токены положить в редис, а на клиент отдавать старую добрую сессию.</li>
+        <li class="next">Ну а stateless останется для микросервисов которые за bff</li>
     </ul>
 </section>
-
-<section class="slide ">
-    <h2 class="shout shrink fs70">blacklist? Но как же stateless?</h2>
-</section>
-
 
 <section class="slide ">
     <h2><span>Как защитить токен от кражи? (Token Sidejacking)</span></h2>
@@ -404,7 +404,7 @@
 <section class="slide ">
     <h2><span>JWT другие проблемы</span></h2>
     <ul>
-        <li>Уязвимости крипографии</li>
+        <li>Уязвимости криптографии</li>
         <li>Множество векторов атак: Signature Forgery, Token Hijacking, Replay Attack, Key Exposure, Brute Force Key Attack, Key ID Injection, JWT Injection, CSRF, Leakage of Sensitive Data</li>
         <li>Прежде чем ее использовать убедитесь что вам это точно (!) нужно. Может просто сессии?</li>
     </ul>
@@ -415,10 +415,10 @@
     <h2><span>Custom JWT авторизация: выводы</span></h2>
     <ul style="font-size: 23px;">
         <li>Фронтендер должен обладать знаниями в области основ безопасности авторизации JWT</li>
-        <li class="next">В данном случае т.к. у нас есть персданные и приложение публичное - по хорошему сказать бекендеру переделать на coockie httpOnly</li>
+        <li class="next">В данном случае т.к. у нас есть персданные и приложение публичное - по хорошему сказать бекендеру переделать на cookie httpOnly</li>
         <li class="next">Бонусом: сильно меньше велосипедного кода на фронтенде, клиент более глупый и тонкий</li>
         <li class="next">Вариант с localstorage можно только во внутренней доверенной сети и для приложений без чувствительных данных</li>
-        <li class="next">Нет готовых библиотек которые реализуют за вас бестпрактисы на фронтенде</li>
+        <li class="next">Нет готовых библиотек которые реализуют за вас bestpractices на фронтенде</li>
     </ul>
 </section>
 
@@ -452,7 +452,7 @@
         <li class="next"><i class="plus"></i> Реализовано шифрование JWS / JWE / JWK</li>
         <li class="next"><i class="plus"></i> httpOnly SameSite Secure cookie</li>
         <li class="next"><i class="plus"></i> Запрос данных расшифрованной cookie с сервера</li>
-        <li class="next"><i class="plus"></i> Синхронизация вкладок, автопроверка, поддержка активности</li>
+        <li class="next"><i class="plus"></i> Автоматическая ревалидация</li>
         <li class="next"><i class="plus"></i> CSRF</li>
         <li class="next"><i class="plus"></i> Ротация токенов</li>
         <li class="next"><i class="minus"></i> Нет Refresh токена => нет механизма отзыва токенов</li>
@@ -460,19 +460,24 @@
 </section>
 
 <section class="slide ">
+    <h2 class="fs70">Разбор Auth.JS: Функциональность</h2>
+    <ol>
+        <li>Готовые обвязки с 50+ разными провайдерами авторизации</li>
+    </ol>
+</section>
+
+<section class="slide ">
     <img src="pictures/authjs-providers.png" class="cover" alt="">
 </section>
+
 
 <section class="slide ">
     <h2 class="fs70">Разбор Auth.JS: Функциональность</h2>
     <ol>
         <li>Готовые обвязки с 50+ разными провайдерами авторизации</li>
-        <li>SSR Friendly</li>
-        <li>Готовые удобные хуки (или другое API для вашего Frontend Framework)</li>
-        <li>Автоматическая ревализация</li>
-        <li>Синхронизация вкладок</li>
-        <!--        <li>Провайдеры к базам данных: typeorm, prisma, sequilize и пр</li>-->
-        <!--        <li>Из коробки дружит с Nextjs</li>-->
+        <li class="next">SSR Friendly</li>
+        <li class="next">Готовые удобные хуки (или другое API для вашего Frontend Framework)</li>
+        <li class="next">Синхронизация вкладок</li>
     </ol>
 </section>
 
@@ -534,7 +539,7 @@
 <!--        <tr>-->
 <!--            <td>Аутентификация через соцсети</td>-->
 <!--            <td>Нет</td>-->
-<!--            <td>Да, например, через Google, Facebook и т.д.</td>-->
+<!--            <td>Да, например, через Google,  и т.д.</td>-->
 <!--        </tr>-->
 <!--        <tr>-->
 <!--            <td>Мобильные приложения для API-доступа</td>-->
@@ -566,7 +571,7 @@
             <br>
                          Примеры:
             <ul>
-                <li>Поставлен корпоративный KeyCloack который используется для семейства корпоративных приложений</li>
+                <li>Поставлен корпоративный KeyCloak который используется для семейства корпоративных приложений</li>
                 <li>Или к примеру вы Яндекс, mail который вынес IDP во внешний сервис</li>
             </ul>
         </li>
@@ -576,7 +581,7 @@
 <section class="slide ">
     <h2>Применимость</h2>
     <ul style="font-size: 20px;">
-        <li class="next">Используются когда использую внешних поставщиков <br> (Google, Facebook, Яндекс)</li>
+        <li class="next">Используются когда использую внешних поставщиков <br> (Google, Яндекс)</li>
         <li class="next">Используются когда вы делегировали функцию аутентификации во внешние сервисы IDP (Auth0/Okta)</li>
         <li class="next">Использование OIDC усложнит вашу архитектуру и добавит накладные расходы</li>
         <li class="next">Не рационально использовать когда у вас нет группы приложений</li>
@@ -599,33 +604,127 @@
 </section>
 
 
+<!--@todo здесь рассказываю-->
+<!--<ul>-->
+<!--    <li>Про разницу в токенах, эндпоинтах, FLOW</li>-->
+<!--</ul>-->
+
 <section class="slide ">
-    <h2>Различие</h2>
-    @todo здесь рассказываю
+    <h2>Различия: токены</h2>
+
+    <h3>Общие для OAuth и OIDC</h3>
     <ul>
-        <li>Про разницу в токенах, эндпоинтах, FLOW</li>
+        <li>access token</li>
+        <li>refresh token</li>
+    </ul>
+
+    <h3>Только OIDC</h3>
+    <ul>
+        <li>ID token</li>
     </ul>
 </section>
 
-<section class="slide ">
-    <h2>FLOW</h2>
-    @todo здесь поверхностно рассказываю про
-    Authorization Code Flow, Implicit Flow
 
-    <br>
-    <br>
-    <br>
-    Client Credentials Flow и Resource Owner Password Credentials Hybrid Flow упоминаю, но не раскрываю
+<section class="slide ">
+    <h2>Различия: эндпоинты</h2>
+
+    <h3>Общие для OAuth и OIDC</h3>
+    <ul>
+        <li><mark>Authorization Endpoint:</mark> для получения кода авторизации.</li>
+        <li><mark>Token Endpoint:</mark> для обмена кода авторизации на токен доступа.</li>
+    </ul>
+
+    <h3>Только OIDC</h3>
+    <ul>
+        <li><mark>UserInfo Endpoint:</mark> для получения профиля пользователя</li>
+    </ul>
+</section>
+
+
+<section class="slide ">
+    <h2>Различия: FLOW</h2>
+
+    <h3>Общие для OAuth и OIDC</h3>
+    <ul>
+        <li><mark>Authorization Code Flow</mark> основной</li>
+        <li><mark>Implicit Flow:</mark>устаревший, небезопасный</li>
+    </ul>
+
+    <h3>Только OIDC</h3>
+    <ul>
+        <li><mark>Hybrid Flow</mark></li>
+    </ul>
+    <!--        <li>Client Credentials Flow</li>-->
+    <!--        <li>Resource Owner Password Credentials</li>-->
 </section>
 
 <section class="slide ">
-    <h2>Уязвимости и способы защиты oAuth/OIDC</h2>
-    <ul>
+    <h2 class="shout" style="font-size: 60px;">Authorization Code Flow</h2>
+</section>
+
+<section class="slide clear">
+    <img src="./pictures/Auth-code-flow-diagram.png" class="cover" alt="">
+</section>
+
+
+<section class="slide ">
+    <h2>Способы защиты oAuth/OIDC</h2>
+    <ol>
         <li>Вспоминаем часть защиты JWT</li>
         <li>PKSE</li>
-        <li>nonce</li>
+        <li>nonce, c_hash, at_hash</li>
+    </ol>
+</section>
+
+
+
+<section class="slide ">
+    <h2>PKSE</h2>
+    <ol>
+        <li>PKCE предотвращает атаку, при которой злоумышленник перехватывает authorization code, чтобы получить access-токен.</li>
+        <li><b>Когда нужно:</b> когда нет доверия каналам клиентом и сервером</li>
+    </ol>
+</section>
+
+<section class="slide ">
+    <img src="./pictures/auth-sequence-auth-code-pkce.png" class="cover" alt="">
+</section>
+
+<section class="slide ">
+    <h2 class="shout" style="font-size: 60px;">Дополнительные механизмы защиты oAuth/OIDC</h2>
+</section>
+
+<section class="slide ">
+    <h2 style="font-size: 50px;">Replay Attack <br>(атака повторного воспроизведения):</h2>
+    <ul>
+        <li><b>Атака:</b> Злоумышленник перехватывает токен или авторизационный запрос и пытается повторно использовать его для входа или получения токенов.</li>
+        <li><b>Механизм защиты:</b>
+            <mark>nonce</mark> обеспечивает уникальность каждого запроса и токена, что делает повторное использование токенов невозможным.</li>
     </ul>
-    @todo
+</section>
+
+<section class="slide ">
+    <h2 style="font-size: 50px;">Authorization Code Interception <br>(перехват кода авторизации):</h2>
+    <ul>
+        <li><b>Атака:</b> злоумышленник перехватывает код авторизации при его передаче через браузер и использует его для получения токенов доступа.</li>
+        <li><b>Механизм защиты:</b>
+            <mark>c_hash</mark> проверяет целостность кода авторизации, предотвращая его подделку или подмену.</li>
+    </ul>
+</section>
+
+
+<section class="slide ">
+    <h2 style="font-size: 50px;">Access Token Injection <br>(внедрение поддельного токена доступа):</h2>
+    <ul>
+        <li><b>Атака:</b> Злоумышленник пытается внедрить поддельный <b>access-токен</b> для получения доступа к защищённым ресурсам.</li>
+        <li><b>Механизм защиты:</b>
+            <mark>at_hash</mark> проверяет целостность <b>access-токена</b>, исключая его подделку или подмену.</li>
+    </ul>
+</section>
+
+<section class="slide ">
+    <h2 class="shout" style="font-size: 50px; line-height: 150%;">OAuth/OIDC серьезно поднимает <br>
+        <mark>complexity</mark> (сложность) <br>вашего приложения</h2>
 </section>
 
 <section class="slide ">
@@ -668,7 +767,7 @@
         <li>Стоит доверять в 1 очередь сертифицированным и обновляемым решениям</li>
     </ol>
 
-    @todo показать табличку дат библиотек
+<!--    @todo показать табличку дат библиотек-->
 </section>
 
 
@@ -678,7 +777,7 @@
         <li class="next">Протоколы oAuth/OIDC подходят не для всех приложений, во многих случаях они могут быть слишком дороги и избыточны</li>
         <li class="next">Авторизация на сессиях остается самой простой и надежной классикой</li>
         <li class="next">Кастомная реализация на JWT токенах имеет право на жизнь, но нужно капитально взвесить все "за" и "против".</li>
-        <li class="next">Какой бы подход не был выбран - желательно не хранить токены в localStorage, хранить в httpOnly cookie</li>
+        <li class="next">Какой бы подход не был выбран &mdash; желательно не хранить токены в localStorage, хранить в httpOnly cookie</li>
         <li class="next">Хороший разработчик должен поверхностно разбираться в вопросах безопасности чтобы его приложения не попадали на самые типовые ошибки</li>
         <li class="next">При выборе готовых решений обязательно смотрите на их текущую актуальность, и следите за выходом их обновлений</li>
     </ul>
