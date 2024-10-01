@@ -508,7 +508,7 @@
   <h2>Session: выводы</h2>
   <ul>
     <li>Этот метод является предпочтительным практически всегда, когда у вас нет микросервисов</li>
-<!--    <li>Если у вас есть BFF, SSR, и вам нужен быстрый старт, &mdash; можно взять готовые инструменты, инкапсулирующие многую сложность (authJS, nextAuth, nuxtAuth)</li>-->
+    <!--    <li>Если у вас есть BFF, SSR, и вам нужен быстрый старт, &mdash; можно взять готовые инструменты, инкапсулирующие многую сложность (authJS, nextAuth, nuxtAuth)</li>-->
     <li>Даже если есть микросервисы &mdash; фронт по прежнему может жить на сессиях, а JWT оставить для внутреннего контура</li>
   </ul>
 </section>
@@ -623,7 +623,6 @@
 </section>
 
 
-<!--@todo здесь рассказываю-->
 <!--<ul>-->
 <!--    <li>Про разницу в токенах, эндпоинтах, FLOW</li>-->
 <!--</ul>-->
@@ -644,29 +643,29 @@
 </section>
 
 
-<section class="slide ">
-  <h2>Различия: эндпоинты</h2>
+<!--<section class="slide ">-->
+<!--  <h2>Различия: эндпоинты</h2>-->
 
-  <h3>Общие для OAuth и OIDC</h3>
-  <ul>
-    <li>
-      <mark>Authorization Endpoint:</mark>
-      для получения кода авторизации
-    </li>
-    <li>
-      <mark>Token Endpoint:</mark>
-      для обмена кода авторизации на токен доступа
-    </li>
-  </ul>
+<!--  <h3>Общие для OAuth и OIDC</h3>-->
+<!--  <ul>-->
+<!--    <li>-->
+<!--      <mark>Authorization Endpoint:</mark>-->
+<!--      для получения кода авторизации-->
+<!--    </li>-->
+<!--    <li>-->
+<!--      <mark>Token Endpoint:</mark>-->
+<!--      для обмена кода авторизации на токен доступа-->
+<!--    </li>-->
+<!--  </ul>-->
 
-  <h3>Только OIDC</h3>
-  <ul>
-    <li>
-      <mark>UserInfo Endpoint:</mark>
-      для получения профиля пользователя
-    </li>
-  </ul>
-</section>
+<!--  <h3>Только OIDC</h3>-->
+<!--  <ul>-->
+<!--    <li>-->
+<!--      <mark>UserInfo Endpoint:</mark>-->
+<!--      для получения профиля пользователя-->
+<!--    </li>-->
+<!--  </ul>-->
+<!--</section>-->
 
 
 <section class="slide ">
@@ -795,12 +794,12 @@
 </section>
 
 <section class="slide ">
-  <h2><span class="gray">Гейткиперы</h2>
+  <h2><span class="gray">Гейткиперы</span></h2>
   <img class="width-wrap" width="560" style="margin-bottom: 20px;" src="pictures/gatekeeper2.svg" alt="">
 </section>
 
 <section class="slide">
-  <h2><span class="gray">Гейткиперы</h2>
+  <h2><span class="gray">Гейткиперы</span></h2>
   <ul class="clear-list">
     <li><i class="plus"></i> Забирает почти всю боль с приложений бэкенда и фронтенда</li>
     <li class="next"><i class="plus"></i> Рекомендации по безопасности из коробки</li>
@@ -809,7 +808,7 @@
 </section>
 
 <section class="slide ">
-  <h2><span class="gray">Где посмотреть подробнее:</h2>
+  <h2><span class="gray">Где посмотреть подробнее:</span></h2>
 
 
   <a style="border: 0; background: transparent" href="https://www.youtube.com/live/Llvnq-n43k0?si=6sNvD2vt54kruG9a&t=4901">
@@ -820,7 +819,7 @@
 </section>
 
 <section class="slide ">
-  <h2><span class="gray">Готовые библиотеки</h2>
+  <h2><span class="gray">Готовые библиотеки</span></h2>
   <ol>
     <li>AuthJS поддерживает OIDC, но не сертифицирован</li>
     <li>Стоит доверять в первую очередь сертифицированным и обновляемым решениям</li>
@@ -831,7 +830,7 @@
 
 
 <section class="slide ">
-  <h2><span class="gray">Выводы</h2>
+  <h2><span class="gray">Выводы</span></h2>
   <ul style="font-size: 18px;">
     <li class="next">Протоколы oAuth/OIDC иногда over engineering</li>
     <li class="next">Авторизация на сессиях &mdash; простая и надежная классикой</li>
@@ -843,7 +842,7 @@
 
 
 <section class="slide ">
-  <h2><span class="gray">Полезные ссылки</h2>
+  <h2><span class="gray">Полезные ссылки</span></h2>
   <ul style="font-size: 18px;">
     <li class="next"><a href="https://github.com/ticarpi/jwt_tool">JWT Attack Playbook</a></li>
     <li class="next"><a href="https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html">OWASP JWT Best Practices</a></li>
