@@ -584,27 +584,57 @@
 <!--</section>-->
 
 <section class="slide ">
-  <h2>Применимость</h2>
-  <ul style="font-size: 20px;">
-    <li class="next">OIDC чаще всего используется в группах приложений, когда сервер авторизации (IDP) вынесен в отдельную сущность. Когда нужно SSO.
-      <br>Примеры:
-      <ul>
-        <li>Поставлен корпоративный KeyCloak, который используется для семейства корпоративных приложений</li>
-        <li>Или к примеру вы Яндекс, mail который вынес IDP во внешний сервис</li>
-      </ul>
-    </li>
-  </ul>
+  <h2 class="shout">Применимость: Когда нужен OIDC</h2>
 </section>
 
-<section class="slide ">
-  <h2>Применимость</h2>
-  <ul style="font-size: 20px;">
-    <li class="next">Используются когда используют внешних поставщиков <br> (Google, Яндекс)</li>
-    <li class="next">Используются когда вы делегировали функцию аутентификации во внешние сервисы IDP (Auth0/Okta)</li>
-    <li class="next">Использование OIDC усложнит вашу архитектуру и добавит накладные расходы</li>
-    <li class="next">Нерационально использовать, когда у вас нет группы приложений</li>
-  </ul>
+<section class="slide " style="text-align: center;">
+  <h2>Применимость: корпоративное или cервисное SSO</h2>
+  <br>
+  <img style="width: 700px;" src="pictures/sso-kk.svg" alt="">
 </section>
+
+<section class="slide " style="text-align: center;">
+  <h2>Применимость: корпоративное или cервисное SSO</h2>
+  <br>
+  <img style="width: 700px;" src="pictures/sss-yandex.svg" alt="">
+</section>
+
+<section class="slide " style="text-align: center;">
+  <h2>Применимость: сторонние поставщики</h2>
+  <br>
+  <img style="width: 700px;" src="pictures/sso-button.svg" alt="">
+</section>
+
+<section class="slide " style="text-align: center;">
+  <h2>Применимость: аутсорс сервис</h2>
+  <br><br>
+  <img style="width: 700px;" src="pictures/sso-auth0.svg" alt="">
+</section>
+
+
+
+<!--<section class="slide ">-->
+<!--  <h2>Применимость</h2>-->
+<!--  <ul style="font-size: 20px;">-->
+<!--    <li class="next">OIDC чаще всего используется в группах приложений, когда сервер авторизации (IDP) вынесен в отдельную сущность. Когда нужно SSO.-->
+<!--      <br>Примеры:-->
+<!--      <ul>-->
+<!--        <li>Поставлен корпоративный KeyCloak, который используется для семейства корпоративных приложений</li>-->
+<!--        <li>Или к примеру вы Яндекс, mail который вынес IDP во внешний сервис</li>-->
+<!--      </ul>-->
+<!--    </li>-->
+<!--  </ul>-->
+<!--</section>-->
+
+<!--<section class="slide ">-->
+<!--  <h2>Применимость</h2>-->
+<!--  <ul style="font-size: 20px;">-->
+<!--    <li class="next">Используются когда используют внешних поставщиков <br> (Google, Яндекс)</li>-->
+<!--    <li class="next">Используются когда вы делегировали функцию аутентификации во внешние сервисы IDP (Auth0/Okta)</li>-->
+<!--    <li class="next">Использование OIDC усложнит вашу архитектуру и добавит накладные расходы</li>-->
+<!--    <li class="next">Нерационально использовать, когда у вас нет группы приложений</li>-->
+<!--  </ul>-->
+<!--</section>-->
 
 <section class="slide ">
   <h2>OAuth/OIDC &mdash; не один стандарт</h2>
@@ -741,47 +771,44 @@
 </section>
 
 <section class="slide ">
-  <h2 class="shout" style="font-size: 60px;">Дополнительные механизмы защиты oAuth/OIDC</h2>
-</section>
-
-<section class="slide ">
-  <h2 style="font-size: 50px;">Replay Attack <br>(атака повторного воспроизведения):</h2>
+  <h2 style="font-size: 50px;">Защищаемся от векторов атак на клиенте:</h2>
   <ul>
-    <li><b>Атака:</b> злоумышленник перехватывает токен или авторизационный запрос и пытается повторно использовать его для входа или получения токенов.</li>
-    <li><b>Механизм защиты:</b>
-      <mark>nonce</mark>
-      обеспечивает уникальность каждого запроса и токена, что делает повторное использование токенов невозможным.
-    </li>
-  </ul>
-</section>
-
-<section class="slide ">
-  <h2 style="font-size: 50px;">Authorization Code Interception <br>(перехват кода авторизации):</h2>
-  <ul>
-    <li><b>Атака:</b> злоумышленник перехватывает код авторизации при его передаче через браузер и использует его для получения токенов доступа.</li>
-    <li><b>Механизм защиты:</b>
-      <mark>c_hash</mark>
-      проверяет целостность кода авторизации, предотвращая его подделку или подмену.
-    </li>
+    <li>Access Token Injection (внедрение поддельного токена доступа)</li>
+    <li>Replay Attack (атака повторного воспроизведения)</li>
+    <li>Authorization Code Interception (перехват кода авторизации)</li>
   </ul>
 </section>
 
 
 <section class="slide ">
-  <h2 style="font-size: 50px;">Access Token Injection <br>(внедрение поддельного токена доступа):</h2>
+  <h2 style="font-size: 50px;">nonce (Number used Once)</h2>
   <ul>
-    <li><b>Атака:</b> злоумышленник пытается внедрить поддельный <b>access-токен</b> для получения доступа к защищённым ресурсам.</li>
-    <li><b>Механизм защиты:</b>
-      <mark>at_hash</mark>
-      проверяет целостность <b>access-токена</b>, исключая его подделку или подмену.
-    </li>
+    <li>Клиент генерирует случайную строку</li>
+    <li>Передает ее в запросе на авторизацию</li>
+    <li>Клиент проверяет что строка появилась в ID-токене</li>
+  </ul>
+</section>
+
+<section class="slide ">
+  <h2 style="font-size: 50px;">c_hash (Code Hash)</h2>
+  <ul>
+    <li>Хешируем код авторизации, вставляем его в ID токен на сервере</li>
+    <li>Проверяем совпадение на клиенте</li>
+  </ul>
+</section>
+
+<section class="slide ">
+  <h2 style="font-size: 50px;">at_hash (Access Token Hash)</h2>
+  <ul>
+    <li>Проверяем что access token принадлежит ID-токену</li>
+    <li>Хешируем access token и вставляем его в ID токен на сервере</li>
+    <li>Проверяем совпадение на клиенте</li>
   </ul>
 </section>
 
 <section class="slide ">
   <h2 class="shout" style="font-size: 50px; line-height: 150%;">OAuth/OIDC серьезно поднимает <br>
-    <mark>complexity</mark>
-                                                                (сложность) <br>вашего приложения
+    <mark>complexity</mark> (сложность) <br>вашего приложения
   </h2>
 </section>
 
